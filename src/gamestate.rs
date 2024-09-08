@@ -1,0 +1,98 @@
+use bevy::{
+    app::{
+        App,
+        Update,
+        FixedUpdate
+    },
+    prelude::{
+        Plugin,
+        Query,
+        With,
+        Without,
+        Transform,
+    },
+    math::bounding::{Aabb2d, BoundingCircle, IntersectsVolume},
+};
+
+use crate::structure::*;
+
+pub struct PongGameStatePlugin;
+
+impl Plugin for PongGameStatePlugin {
+    fn build(&self, app: & mut App) {
+        app.add_systems(Update, project_positions);
+        app.add_systems(FixedUpdate, handle_collisions);
+    }
+}
+
+// Map 2d Position to engine-internal Transform
+fn project_positions(
+    mut positionables: Query<(&mut Transform, &Position)>
+) {
+    for (mut transform, position) in &mut positionables {
+        transform.translation = position.0.extend(0.);
+    }
+}
+
+// Check for intersections between a circle collider (pong ball) and a provided axis-aligned bounding box
+fn collide_with_side(
+    ball: BoundingCircle,
+    wall: Aabb2d
+) -> Option<Collision> {
+
+    // We're only doing discrete collision so if the bounding boxes don't intersect we don't care
+    if !ball.intersects(&wall) { return None; }
+
+    // Find the closest point on the ball collider to the wall
+    let closest_point = wall.closest_point(ball.center);
+    // Get the distance from the center to the collision point
+    let offset = ball.center - closest_point;
+
+    /*
+    This collision check works like process of elimination. First we check whether we're closer to
+    the sides or the top and bottom. That eliminates half the collision options immediately. Then
+    we check if we're clipping the left or top wall (a negative collision distance). If we are, we
+    return that, otherwise we return the opposite.
+    */
+    let side  = if offset.x.abs() > offset.y.abs() {
+        if offset.x < 0. {
+            Collision::Left
+        } else {
+            Collision::Right
+        }
+    } else if offset.y > 0. {
+        Collision::Top
+    } else {
+        Collision::Bottom
+    };
+
+    Some(side)
+}
+
+// Check collisions between the pong ball and any Entity with a Shape Component using collide_with_side()
+fn handle_collisions (
+    mut ball: Query<(&mut Velocity, &Position, &Shape), With<Ball>>,
+    other_things : Query<(&Position, &Shape), Without<Ball>>
+) {
+    if let Ok((
+        mut ball_velocity,
+        ball_position,
+        ball_shape
+    )) = ball.get_single_mut() {
+        for (position, shape) in &other_things {
+            if let Some(collision) = collide_with_side(
+                BoundingCircle::new(ball_position.0, ball_shape.0.x),
+                Aabb2d::new(position.0, shape.0 / 2.)
+            ) {
+                match collision {
+                    Collision::Left | Collision::Right => {
+                        ball_velocity.0.x *=-1.;
+                    }
+                    Collision::Top | Collision::Bottom => {
+                        ball_velocity.0.y *= -1.;
+                    }
+                }
+            }
+        }
+    }
+}
