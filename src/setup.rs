@@ -1,27 +1,15 @@
 use bevy::{
     app::{App, Startup},
+    asset::Assets,
     ecs::{
-        system::{Commands, Query},
         change_detection::ResMut,
+        system::{Commands, Query},
+    },
+    prelude::{
+        default, Camera2dBundle, Circle, Color, ColorMaterial, JustifyText, Mesh, Plugin,
+        Rectangle, Text, Text2dBundle, TextStyle, Transform, Window,
     },
     sprite::{Anchor, MaterialMesh2dBundle},
-    prelude::{
-        Camera2dBundle,
-        Mesh,
-        ColorMaterial,
-        Circle,
-        default,
-        Window,
-        Rectangle,
-        Color,
-        Text2dBundle,
-        Transform,
-        TextStyle,
-        Text,
-        JustifyText,
-        Plugin
-    },
-    asset::Assets,
 };
 
 use crate::structure::*;
@@ -29,14 +17,17 @@ use crate::structure::*;
 pub struct PongInitPlugin;
 
 impl Plugin for PongInitPlugin {
-    fn build(&self, app: & mut App) {
-        app.add_systems(Startup, (
-            spawn_camera,
-            spawn_ball,
-            spawn_paddles,
-            spawn_gutters,
-            spawn_scoreboard,
-        ));
+    fn build(&self, app: &mut App) {
+        app.add_systems(
+            Startup,
+            (
+                spawn_camera,
+                spawn_ball,
+                spawn_paddles,
+                spawn_gutters,
+                spawn_scoreboard,
+            ),
+        );
     }
 }
 
@@ -46,18 +37,17 @@ impl Plugin for PongInitPlugin {
 
 // Create scene camera
 pub fn spawn_camera(mut commands: Commands) {
-    commands.spawn_empty()
-        .insert(Camera2dBundle::default());
+    commands.spawn_empty().insert(Camera2dBundle::default());
 }
 
 // Spawn a red pong ball at the center of the screen moving up-right
 pub fn spawn_ball(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     println!("Spawning ball...");
-    
+
     let ball = BallBundle::new(1., 1.);
 
     // Define ball mesh and material
@@ -67,7 +57,7 @@ pub fn spawn_ball(
     // Instance mesh into memory and return Handle reference
     let mesh_handle = meshes.add(shape);
     let material_handle = materials.add(color);
-    
+
     commands.spawn((
         ball,
         MaterialMesh2dBundle {
@@ -83,11 +73,11 @@ pub fn spawn_paddles(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    window: Query<&Window>
+    window: Query<&Window>,
 ) {
     println!("Spawning paddles...");
 
-    if let Ok(window) = window.get_single(){
+    if let Ok(window) = window.get_single() {
         let window_width = window.resolution.width();
         let padding = 50.;
         let right_paddle_x = window_width / 2. - padding;
@@ -98,7 +88,7 @@ pub fn spawn_paddles(
 
         let shape = Mesh::from(Rectangle::new(ai_paddle.shape.0.x, ai_paddle.shape.0.y));
         let color = ColorMaterial::from(Color::hsl(105., 1., 0.28));
-        
+
         // Instance mesh into memory and return Handle reference
         let mesh_handle = meshes.add(shape);
         let material_handle = materials.add(color);
@@ -130,7 +120,7 @@ pub fn spawn_gutters(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    window: Query<&Window>
+    window: Query<&Window>,
 ) {
     if let Ok(window) = window.get_single() {
         let (window_width, window_height) = window.resolution.size().into();
@@ -159,7 +149,7 @@ pub fn spawn_gutters(
         ));
 
         commands.spawn((
-        bottom_gutter,
+            bottom_gutter,
             MaterialMesh2dBundle {
                 mesh: mesh_handle.into(),
                 material: material_handle,
@@ -170,10 +160,7 @@ pub fn spawn_gutters(
 }
 
 // Spawn a scoreboard displaying the game score in the format {ai} - {player} at the top of the screen
-pub fn spawn_scoreboard(
-    mut commands: Commands,
-    window: Query<&Window>
-) {
+pub fn spawn_scoreboard(mut commands: Commands, window: Query<&Window>) {
     if let Ok(window) = window.get_single() {
         let text_pos = Transform::from_xyz(0., (window.height() / 2.) - 20., 0.);
 
@@ -192,7 +179,7 @@ pub fn spawn_scoreboard(
                 transform: text_pos,
                 ..default()
             },
-            Scoreboard
+            Scoreboard,
         ));
     }
 }

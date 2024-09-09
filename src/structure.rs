@@ -1,13 +1,7 @@
 use bevy::{
-    ecs::{
-        component::Component,
-        event::Event,
-    },
+    ecs::{component::Component, event::Event},
     math::Vec2,
-    prelude::{
-        Resource,
-        Bundle,    
-    }
+    prelude::{Bundle, Resource},
 };
 
 // ##############################################################
@@ -22,7 +16,6 @@ pub const PADDLE_WIDTH: f32 = 10.; // Dimensions of the paddles in world units
 pub const PADDLE_HEIGHT: f32 = 50.;
 
 pub const GUTTER_HEIGHT: f32 = 20.; // Height of the top and bottom gutters in world units
-
 
 // ##############################################################
 // # Helper Types
@@ -40,9 +33,8 @@ pub enum Collision {
 // Used to communicate which player scored in ScoreEvent
 pub enum Scorer {
     Ai,
-    Player
+    Player,
 }
-
 
 // ##############################################################
 // # Global Events & Resources
@@ -59,7 +51,6 @@ pub struct Score {
     pub ai: u32,
 }
 
-
 // ##############################################################
 // # Generic Components
 // ##############################################################
@@ -75,7 +66,6 @@ pub struct Velocity(pub Vec2);
 // Generic component holding the height and width of an entity's primitive mesh
 #[derive(Component)]
 pub struct Shape(pub Vec2);
-
 
 // ##############################################################
 // # Entity Labels
@@ -103,7 +93,6 @@ pub struct Gutter;
 #[derive(Component)]
 pub struct Scoreboard;
 
-
 // ##############################################################
 // # Entity Bundles
 // ##############################################################
@@ -111,10 +100,10 @@ pub struct Scoreboard;
 // Pong ball template
 #[derive(Bundle)]
 pub struct BallBundle {
-    pub ball: Ball, // Label
-    pub shape: Shape, // Dimensions of the sprite
+    pub ball: Ball,         // Label
+    pub shape: Shape,       // Dimensions of the sprite
     pub position: Position, // 2d position
-    pub velocity: Velocity // Sum of system forces/move direction
+    pub velocity: Velocity, // Sum of system forces/move direction
 }
 
 impl BallBundle {

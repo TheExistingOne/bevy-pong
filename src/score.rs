@@ -2,32 +2,27 @@ use crate::structure::*;
 use bevy::{
     app::{App, Update},
     ecs::schedule::IntoSystemConfigs,
-    prelude::{
-        Query,
-        Window,
-        With,
-        EventReader,
-        EventWriter,
-        Res,
-        ResMut,
-        DetectChanges,
-        Text,
-        Plugin,
-    },
     math::Vec2,
+    prelude::{
+        DetectChanges, EventReader, EventWriter, Plugin, Query, Res, ResMut, Text, Window, With,
+    },
 };
 
 pub struct PongScorePlugin;
 
 impl Plugin for PongScorePlugin {
-    fn build(&self, app: & mut App) {
+    fn build(&self, app: &mut App) {
         app.init_resource::<Score>();
         app.add_event::<ScoreEvent>();
-        app.add_systems(Update, (
-            detect_scoring,
-            update_score,
-            (update_scoreboard, reset_ball) 
-        ).chain());
+        app.add_systems(
+            Update,
+            (
+                detect_scoring,
+                update_score,
+                (update_scoreboard, reset_ball),
+            )
+                .chain(),
+        );
     }
 }
 
@@ -35,7 +30,7 @@ impl Plugin for PongScorePlugin {
 fn detect_scoring(
     mut ball: Query<&mut Position, With<Ball>>,
     window: Query<&Window>,
-    mut events: EventWriter<ScoreEvent>
+    mut events: EventWriter<ScoreEvent>,
 ) {
     if let Ok(window) = window.get_single() {
         let window_width = window.resolution.width();
@@ -51,10 +46,7 @@ fn detect_scoring(
 }
 
 // Listen for ScoreEvents and update global score accordingly
-fn update_score (
-    mut score: ResMut<Score>,
-    mut events: EventReader<ScoreEvent>
-) {
+fn update_score(mut score: ResMut<Score>, mut events: EventReader<ScoreEvent>) {
     for event in events.read() {
         match event.0 {
             Scorer::Ai => score.ai += 1,
@@ -71,10 +63,7 @@ fn reset_ball(
     mut events: EventReader<ScoreEvent>,
 ) {
     for event in events.read() {
-        if let Ok ((
-            mut position,
-            mut velocity
-        )) = ball.get_single_mut() {
+        if let Ok((mut position, mut velocity)) = ball.get_single_mut() {
             match event.0 {
                 Scorer::Ai => {
                     position.0 = Vec2::ZERO;
@@ -90,10 +79,7 @@ fn reset_ball(
 }
 
 // When the score changes, update the UI score text
-fn update_scoreboard (
-    mut scoreboard: Query<&mut Text, With<Scoreboard>>,
-    score: Res<Score>
-) {
+fn update_scoreboard(mut scoreboard: Query<&mut Text, With<Scoreboard>>, score: Res<Score>) {
     if score.is_changed() {
         if let Ok(mut text) = scoreboard.get_single_mut() {
             text.sections[0].value = format!("{} - {}", score.player, score.ai);

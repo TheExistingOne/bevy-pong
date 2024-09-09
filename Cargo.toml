@@ -7,7 +7,10 @@ edition = "2021"
 # Bevy Framework with dynamic linking and dual X11/Wayland support
 bevy = { version = "0.14.2", features = ["dynamic_linking", "wayland"] }
 # Disable internal Bevy logging
-log = { version = "*", features = ["max_level_debug", "release_max_level_warn"] }
+log = { version = "*", features = [
+    "max_level_debug",
+    "release_max_level_warn",
+] }
 
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]
@@ -33,4 +36,3 @@ inherits = "release"
 opt-level = "s"
 # Strip all debugging info
 strip = "debuginfo"
-

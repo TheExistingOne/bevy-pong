@@ -1,18 +1,7 @@
 use bevy::{
-    app::{
-        App,
-        PreUpdate
-    },
-    prelude::{
-        Res,
-        Plugin,
-        ButtonInput,
-        Query,
-        KeyCode,
-        With,
-        Window
-    },
-    ecs::schedule::IntoSystemConfigs
+    app::{App, PreUpdate},
+    ecs::schedule::IntoSystemConfigs,
+    prelude::{ButtonInput, KeyCode, Plugin, Query, Res, Window, With},
 };
 
 use crate::structure::*;
@@ -20,12 +9,11 @@ use crate::structure::*;
 pub struct PongActorPlugin;
 
 impl Plugin for PongActorPlugin {
-    fn build(&self, app: & mut App) {
-        app.add_systems(PreUpdate, (
-            (handle_player_input,
-            ai_movement),
-            move_paddles
-        ).chain());
+    fn build(&self, app: &mut App) {
+        app.add_systems(
+            PreUpdate,
+            ((handle_player_input, ai_movement), move_paddles).chain(),
+        );
         app.add_systems(PreUpdate, move_ball);
     }
 }
@@ -47,7 +35,7 @@ fn handle_player_input(
 }
 
 // Calculate AI movement direction (if any)
-fn ai_movement (
+fn ai_movement(
     mut ai: Query<(&mut Velocity, &Position), With<Ai>>,
     ball: Query<&Position, With<Ball>>,
 ) {
@@ -62,9 +50,7 @@ fn ai_movement (
 }
 
 // Update position of pong ball
-fn move_ball (
-    mut ball: Query<(&mut Position, &Velocity), With<Ball>>
-) {
+fn move_ball(mut ball: Query<(&mut Position, &Velocity), With<Ball>>) {
     if let Ok((mut position, velocity)) = ball.get_single_mut() {
         position.0 += velocity.0 * BALL_SPEED;
     }
@@ -72,7 +58,7 @@ fn move_ball (
 
 fn move_paddles(
     mut paddle: Query<(&mut Position, &Velocity), With<Paddle>>,
-    window: Query<&Window>
+    window: Query<&Window>,
 ) {
     if let Ok(window) = window.get_single() {
         let window_height = window.resolution.height();

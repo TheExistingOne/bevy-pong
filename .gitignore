@@ -1,1 +1,15 @@
+# Don't commit builds
 /target
+/debug
+
+# rustfmt backups
+**/*.rs.bk
+
+# Exclude editor configuration
+/.vscode/*
+# Unless it's *important* editor configuration
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# No reason to commit debug symbols
+*.pdb
