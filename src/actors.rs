@@ -42,9 +42,10 @@ fn ai_movement(
     if let Ok((mut velocity, position)) = ai.get_single_mut() {
         if let Ok(ball_position) = ball.get_single() {
             let a_to_b = ball_position.0 - position.0;
+            let accel = exp_easeout(a_to_b.y / WIN_HEIGHT, AI_SKILL);
 
             // If the AI paddle is above the ball, move down, if it's below move up
-            velocity.0.y = a_to_b.y.signum();
+            velocity.0.y = accel;
         }
     }
 }

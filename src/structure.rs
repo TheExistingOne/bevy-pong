@@ -18,6 +18,8 @@ pub const PADDLE_SPEED: f32 = 5.; // Speed per frame of the paddles in world uni
 pub const PADDLE_WIDTH: f32 = 10.; // Dimensions of the paddles in world units
 pub const PADDLE_HEIGHT: f32 = 50.;
 
+pub const AI_SKILL: f32 = 15.; // Adjusts how rapidly the AI's smoothing function responds
+
 pub const GUTTER_HEIGHT: f32 = 20.; // Height of the top and bottom gutters in world units
 
 // ##############################################################
@@ -156,4 +158,13 @@ impl GutterBundle {
             position: Position(Vec2::new(x, y)),
         }
     }
+}
+
+// ##############################################################
+// # Helper Functions
+// ##############################################################
+
+pub fn exp_easeout(t: f32, m: f32) -> f32 {
+    // 1 - (1 - time)^magnitude
+    1. - (1. - t).powf(m)
 }
