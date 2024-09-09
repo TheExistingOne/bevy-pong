@@ -164,6 +164,7 @@ impl GutterBundle {
 // # Helper Functions
 // ##############################################################
 
+// https://easings.net is a great resource for these
 pub fn exp_easeout(t: f32, m: f32) -> f32 {
     // 1 - (1 - time)^magnitude
     1. - (1. - t).powf(m)

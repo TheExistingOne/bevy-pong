@@ -20,7 +20,7 @@ Started out following [this tutorial](https://taintedcoders.com/bevy/pong-tutori
 ## Planned next steps
 
 - [x] Make the AI less jittery
-- [ ] Clean up collision to actually eject the ball instead of just reversing direction to avoid edge cases
+- [X] Clean up collision to actually eject the ball instead of just reversing direction to avoid edge cases
 - [ ] Win state
 - [x] Make the AI beatable
 - [ ] Use `bevy::ui` instead of using hacked together FontBundle2d UI
