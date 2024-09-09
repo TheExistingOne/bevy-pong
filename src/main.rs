@@ -28,7 +28,7 @@ fn main() {
                 primary_window: Some(Window {
                     title: String::from("Bevy Pong!"),
                     name: Some(String::from("dev.mialikestech.bevypong")),
-                    resolution: (1280., 720.).into(),
+                    resolution: (structure::WIN_WIDTH, structure::WIN_HEIGHT).into(),
                     present_mode: PresentMode::AutoVsync,
                     resizable: false,
                     enabled_buttons: EnabledButtons {

@@ -3,9 +3,7 @@ use bevy::{
     app::{App, Update},
     ecs::schedule::IntoSystemConfigs,
     math::Vec2,
-    prelude::{
-        DetectChanges, EventReader, EventWriter, Plugin, Query, Res, ResMut, Text, Window, With,
-    },
+    prelude::{DetectChanges, EventReader, EventWriter, Plugin, Query, Res, ResMut, Text, With},
 };
 
 pub struct PongScorePlugin;
@@ -27,20 +25,12 @@ impl Plugin for PongScorePlugin {
 }
 
 // If the ball is off the screen, check which players side and issue a ScoreEvent with that information
-fn detect_scoring(
-    mut ball: Query<&mut Position, With<Ball>>,
-    window: Query<&Window>,
-    mut events: EventWriter<ScoreEvent>,
-) {
-    if let Ok(window) = window.get_single() {
-        let window_width = window.resolution.width();
-
-        if let Ok(ball) = ball.get_single_mut() {
-            if ball.0.x > window_width / 2. {
-                events.send(ScoreEvent(Scorer::Ai));
-            } else if ball.0.x < -window_width / 2. {
-                events.send(ScoreEvent(Scorer::Player));
-            }
+fn detect_scoring(mut ball: Query<&mut Position, With<Ball>>, mut events: EventWriter<ScoreEvent>) {
+    if let Ok(ball) = ball.get_single_mut() {
+        if ball.0.x > WIN_WIDTH / 2. {
+            events.send(ScoreEvent(Scorer::Ai));
+        } else if ball.0.x < -WIN_WIDTH / 2. {
+            events.send(ScoreEvent(Scorer::Player));
         }
     }
 }

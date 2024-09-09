@@ -1,7 +1,7 @@
 use bevy::{
     app::{App, PreUpdate},
     ecs::schedule::IntoSystemConfigs,
-    prelude::{ButtonInput, KeyCode, Plugin, Query, Res, Window, With},
+    prelude::{ButtonInput, KeyCode, Plugin, Query, Res, With},
 };
 
 use crate::structure::*;
@@ -56,19 +56,13 @@ fn move_ball(mut ball: Query<(&mut Position, &Velocity), With<Ball>>) {
     }
 }
 
-fn move_paddles(
-    mut paddle: Query<(&mut Position, &Velocity), With<Paddle>>,
-    window: Query<&Window>,
-) {
-    if let Ok(window) = window.get_single() {
-        let window_height = window.resolution.height();
-        let max_y = window_height / 2. - GUTTER_HEIGHT - PADDLE_HEIGHT / 2.;
+fn move_paddles(mut paddle: Query<(&mut Position, &Velocity), With<Paddle>>) {
+    let max_y = WIN_HEIGHT / 2. - GUTTER_HEIGHT - PADDLE_HEIGHT / 2.;
 
-        for (mut position, velocity) in &mut paddle {
-            let new_position = position.0 + velocity.0 * PADDLE_SPEED;
-            if new_position.y.abs() < max_y {
-                position.0 = new_position;
-            }
+    for (mut position, velocity) in &mut paddle {
+        let new_position = position.0 + velocity.0 * PADDLE_SPEED;
+        if new_position.y.abs() < max_y {
+            position.0 = new_position;
         }
     }
 }

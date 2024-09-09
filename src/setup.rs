@@ -120,66 +120,59 @@ pub fn spawn_gutters(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    window: Query<&Window>,
 ) {
-    if let Ok(window) = window.get_single() {
-        let (window_width, window_height) = window.resolution.size().into();
+    // Window coordinates have the corner be 0,0 while world coordinates that's the center so
+    // we devide by two to convert
+    let top_gutter_y = WIN_HEIGHT / 2. - GUTTER_HEIGHT / 2.;
+    let bottom_gutter_y = -WIN_HEIGHT / 2. + GUTTER_HEIGHT / 2.;
 
-        // Window coordinates have the corner be 0,0 while world coordinates that's the center so
-        // we devide by two to convert
-        let top_gutter_y = window_height / 2. - GUTTER_HEIGHT / 2.;
-        let bottom_gutter_y = -window_height / 2. + GUTTER_HEIGHT / 2.;
+    let top_gutter = GutterBundle::new(0., top_gutter_y, WIN_WIDTH);
+    let bottom_gutter = GutterBundle::new(0., bottom_gutter_y, WIN_WIDTH);
 
-        let top_gutter = GutterBundle::new(0., top_gutter_y, window_width);
-        let bottom_gutter = GutterBundle::new(0., bottom_gutter_y, window_width);
+    let mesh = Mesh::from(Rectangle::from_size(top_gutter.shape.0));
+    let material = ColorMaterial::from(Color::hsl(0., 1., 1.));
 
-        let mesh = Mesh::from(Rectangle::from_size(top_gutter.shape.0));
-        let material = ColorMaterial::from(Color::hsl(0., 1., 1.));
+    let mesh_handle = meshes.add(mesh);
+    let material_handle = materials.add(material);
 
-        let mesh_handle = meshes.add(mesh);
-        let material_handle = materials.add(material);
+    commands.spawn((
+        top_gutter,
+        MaterialMesh2dBundle {
+            mesh: mesh_handle.clone().into(),
+            material: material_handle.clone(),
+            ..default()
+        },
+    ));
 
-        commands.spawn((
-            top_gutter,
-            MaterialMesh2dBundle {
-                mesh: mesh_handle.clone().into(),
-                material: material_handle.clone(),
-                ..default()
-            },
-        ));
-
-        commands.spawn((
-            bottom_gutter,
-            MaterialMesh2dBundle {
-                mesh: mesh_handle.into(),
-                material: material_handle,
-                ..default()
-            },
-        ));
-    }
+    commands.spawn((
+        bottom_gutter,
+        MaterialMesh2dBundle {
+            mesh: mesh_handle.into(),
+            material: material_handle,
+            ..default()
+        },
+    ));
 }
 
 // Spawn a scoreboard displaying the game score in the format {ai} - {player} at the top of the screen
-pub fn spawn_scoreboard(mut commands: Commands, window: Query<&Window>) {
-    if let Ok(window) = window.get_single() {
-        let text_pos = Transform::from_xyz(0., (window.height() / 2.) - 20., 0.);
+pub fn spawn_scoreboard(mut commands: Commands) {
+    let text_pos = Transform::from_xyz(0., (WIN_HEIGHT / 2.) - 20., 0.);
 
-        commands.spawn((
-            Text2dBundle {
-                text: Text::from_section(
-                    "0 - 0",
-                    TextStyle {
-                        font_size: 48.0,
-                        color: Color::WHITE,
-                        ..default()
-                    },
-                )
-                .with_justify(JustifyText::Center),
-                text_anchor: Anchor::TopCenter,
-                transform: text_pos,
-                ..default()
-            },
-            Scoreboard,
-        ));
-    }
+    commands.spawn((
+        Text2dBundle {
+            text: Text::from_section(
+                "0 - 0",
+                TextStyle {
+                    font_size: 48.0,
+                    color: Color::WHITE,
+                    ..default()
+                },
+            )
+            .with_justify(JustifyText::Center),
+            text_anchor: Anchor::TopCenter,
+            transform: text_pos,
+            ..default()
+        },
+        Scoreboard,
+    ));
 }
