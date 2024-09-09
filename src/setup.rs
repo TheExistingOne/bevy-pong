@@ -126,7 +126,7 @@ pub fn spawn_gutters(
         let (window_width, window_height) = window.resolution.size().into();
 
         // Window coordinates have the corner be 0,0 while world coordinates that's the center so
-        // we devide bny two to convert
+        // we devide by two to convert
         let top_gutter_y = window_height / 2. - GUTTER_HEIGHT / 2.;
         let bottom_gutter_y = -window_height / 2. + GUTTER_HEIGHT / 2.;
 
