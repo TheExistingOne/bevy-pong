@@ -27,7 +27,7 @@ Started out following [this tutorial](https://taintedcoders.com/bevy/pong-tutori
 - [ ] Work out bevy scenes
 - [ ] Make a menu
 - [ ] Add some sprites to things
-- [ ] Make the window a little more consistent
+- [x] Make the window a little more consistent
 - [ ] Migrate to an actual collision handler
 - [ ] Add some shaders and polish
 

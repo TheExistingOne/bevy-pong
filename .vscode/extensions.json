@@ -3,6 +3,9 @@
         "rust-lang.rust-analyzer",
         "tamasfe.even-better-toml",
         "EditorConfig.EditorConfig",
-        "sndst00m.markdown-github-dark-pack",
+        "yzhang.markdown-all-in-one",
+        "houkanshan.vscode-markdown-footnote",
+        "bierner.markdown-preview-github-styles",
+        "bierner.emojisense",
     ]
 }

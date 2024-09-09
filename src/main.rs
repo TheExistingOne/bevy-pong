@@ -1,4 +1,8 @@
-use bevy::{app::PluginGroupBuilder, prelude::*};
+use bevy::{
+    app::PluginGroupBuilder,
+    prelude::*,
+    window::{EnabledButtons, PresentMode},
+};
 
 mod actors; // Stores behavior of active objects
 mod gamestate;
@@ -18,5 +22,24 @@ impl PluginGroup for PongGame {
 }
 
 fn main() {
-    App::new().add_plugins((DefaultPlugins, PongGame)).run();
+    App::new()
+        .add_plugins((
+            DefaultPlugins.set(WindowPlugin {
+                primary_window: Some(Window {
+                    title: String::from("Bevy Pong!"),
+                    name: Some(String::from("dev.mialikestech.bevypong")),
+                    resolution: (1280., 720.).into(),
+                    present_mode: PresentMode::AutoVsync,
+                    resizable: false,
+                    enabled_buttons: EnabledButtons {
+                        maximize: false,
+                        ..default()
+                    },
+                    ..default()
+                }),
+                ..default()
+            }),
+            PongGame,
+        ))
+        .run();
 }
