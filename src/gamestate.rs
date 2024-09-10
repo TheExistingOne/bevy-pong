@@ -1,7 +1,7 @@
 use bevy::{
-    app::{App, FixedUpdate, Update},
+    app::{App, FixedUpdate},
     math::bounding::{Aabb2d, BoundingCircle, IntersectsVolume},
-    prelude::{Plugin, Query, Transform, Vec2, With, Without},
+    prelude::{IntoSystemConfigs, Plugin, Query, Transform, Vec2, With, Without},
 };
 
 use crate::structure::*;
@@ -10,8 +10,7 @@ pub struct PongGameStatePlugin;
 
 impl Plugin for PongGameStatePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, project_positions);
-        app.add_systems(FixedUpdate, handle_collisions);
+        app.add_systems(FixedUpdate, (handle_collisions, project_positions).chain());
     }
 }
 
@@ -45,23 +44,23 @@ fn collide_with_side(ball: BoundingCircle, wall: Aabb2d) -> Option<(Collision, V
         if offset.x < 0. {
             (
                 Collision::Left,
-                closest_point - (Vec2::X * (ball.radius() + 0.2)),
+                closest_point - (Vec2::X * (ball.radius() + 0.5)),
             )
         } else {
             (
                 Collision::Right,
-                closest_point + (Vec2::X * (ball.radius() + 0.2)),
+                closest_point + (Vec2::X * (ball.radius() + 0.5)),
             )
         }
     } else if offset.y > 0. {
         (
             Collision::Top,
-            closest_point - (Vec2::Y * (ball.radius() + 0.2)),
+            closest_point + (Vec2::Y * (ball.radius() + 0.5)),
         )
     } else {
         (
             Collision::Bottom,
-            closest_point + (Vec2::Y * (ball.radius() + 0.2)),
+            closest_point - (Vec2::Y * (ball.radius() + 0.5)),
         )
     };
 
@@ -71,36 +70,65 @@ fn collide_with_side(ball: BoundingCircle, wall: Aabb2d) -> Option<(Collision, V
 // Check collisions between the pong ball and any Entity with a Shape Component using collide_with_side()
 // Unlike most systems impacting game elements, this takes direct conotrol over Transform
 fn handle_collisions(
-    mut ball: Query<(&mut Velocity, &mut Transform, &Position, &Shape), With<Ball>>,
+    mut ball: Query<(&mut Velocity, &mut Position, &Shape), With<Ball>>,
     other_things: Query<(&Position, &Shape), Without<Ball>>,
 ) {
-    if let Ok((mut ball_velocity, mut ball_transform, ball_position, ball_shape)) =
-        ball.get_single_mut()
-    {
+    if let Ok((mut ball_velocity, mut ball_position, ball_shape)) = ball.get_single_mut() {
         for (position, shape) in &other_things {
-            if let Some((collision, exit)) = collide_with_side(
+            match collide_with_side(
                 BoundingCircle::new(ball_position.0, ball_shape.0.x),
                 Aabb2d::new(position.0, shape.0 / 2.),
             ) {
-                match collision {
-                    Collision::Left => {
-                        ball_transform.translation += exit.extend(0.);
-                        ball_velocity.0.x *= -1.;
+                Some((collision, exit)) => {
+                    match collision {
+                        Collision::Left => {
+                            ball_position.0 = exit;
+                            ball_velocity.0.x *= -1.;
+                        }
+                        Collision::Right => {
+                            ball_position.0 = exit;
+                            ball_velocity.0.x *= -1.;
+                        }
+                        Collision::Top => {
+                            ball_position.0 = exit;
+                            ball_velocity.0.y *= -1.;
+                        }
+                        Collision::Bottom => {
+                            ball_position.0 = exit;
+                            ball_velocity.0.y *= -1.;
+                        }
                     }
-                    Collision::Right => {
-                        ball_transform.translation += exit.extend(0.);
-                        ball_velocity.0.x *= -1.;
-                    }
-                    Collision::Top => {
-                        ball_transform.translation += exit.extend(0.);
-                        ball_velocity.0.y *= -1.;
-                    }
-                    Collision::Bottom => {
-                        ball_transform.translation += exit.extend(0.);
-                        ball_velocity.0.y *= -1.;
-                    }
+                    println!(
+                        "Collision on {:?}, exit point should be {:?}",
+                        collision, exit
+                    );
                 }
+                None => {}
             }
+
+            // if let Some((collision, exit)) = collide_with_side(
+            //     BoundingCircle::new(ball_position.0, ball_shape.0.x),
+            //     Aabb2d::new(position.0, shape.0 / 2.),
+            // ) {
+            //     match collision {
+            //         Collision::Left => {
+            //             ball_transform.translation += exit.extend(0.);
+            //             ball_velocity.0.x *= -1.;
+            //         }
+            //         Collision::Right => {
+            //             ball_transform.translation += exit.extend(0.);
+            //             ball_velocity.0.x *= -1.;
+            //         }
+            //         Collision::Top => {
+            //             ball_transform.translation += exit.extend(0.);
+            //             ball_velocity.0.y *= -1.;
+            //         }
+            //         Collision::Bottom => {
+            //             ball_transform.translation += exit.extend(0.);
+            //             ball_velocity.0.y *= -1.;
+            //         }
+            //     }
+            // }
         }
     }
 }

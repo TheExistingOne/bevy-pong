@@ -43,8 +43,6 @@ fn update_score(mut score: ResMut<Score>, mut events: EventReader<ScoreEvent>) {
             Scorer::Player => score.player += 1,
         }
     }
-
-    println!("Score: {} - {}", score.player, score.ai);
 }
 
 // Return the ball to the center on a ScoreEvent
