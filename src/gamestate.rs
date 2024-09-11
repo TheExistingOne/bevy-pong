@@ -89,12 +89,12 @@ fn handle_collisions(
                     Collision::Left => {
                         ball_position.0 = exit;
                         //ball_velocity.0.y = mapped_angle * ball_velocity.0.y.signum();
-                        ball_velocity.0.x = -1.;
+                        ball_velocity.0.x *= -1.;
                     }
                     Collision::Right => {
                         ball_position.0 = exit;
                         //ball_velocity.0.y = mapped_angle * ball_velocity.0.y.signum();
-                        ball_velocity.0.x = -1.;
+                        ball_velocity.0.x *= -1.;
                     }
                     Collision::Top => {
                         ball_position.0 = exit;
