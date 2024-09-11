@@ -75,60 +75,37 @@ fn handle_collisions(
 ) {
     if let Ok((mut ball_velocity, mut ball_position, ball_shape)) = ball.get_single_mut() {
         for (position, shape) in &other_things {
-            match collide_with_side(
+            if let Some((collision, exit)) = collide_with_side(
                 BoundingCircle::new(ball_position.0, ball_shape.0.x),
                 Aabb2d::new(position.0, shape.0 / 2.),
             ) {
-                Some((collision, exit)) => {
-                    match collision {
-                        Collision::Left => {
-                            ball_position.0 = exit;
-                            ball_velocity.0.x *= -1.;
-                        }
-                        Collision::Right => {
-                            ball_position.0 = exit;
-                            ball_velocity.0.x *= -1.;
-                        }
-                        Collision::Top => {
-                            ball_position.0 = exit;
-                            ball_velocity.0.y *= -1.;
-                        }
-                        Collision::Bottom => {
-                            ball_position.0 = exit;
-                            ball_velocity.0.y *= -1.;
-                        }
-                    }
-                    println!(
-                        "Collision on {:?}, exit point should be {:?}",
-                        collision, exit
-                    );
-                }
-                None => {}
-            }
+                // Vertical distance to center of collision
+                //let center_dist = (position.0.y - exit.y).abs();
 
-            // if let Some((collision, exit)) = collide_with_side(
-            //     BoundingCircle::new(ball_position.0, ball_shape.0.x),
-            //     Aabb2d::new(position.0, shape.0 / 2.),
-            // ) {
-            //     match collision {
-            //         Collision::Left => {
-            //             ball_transform.translation += exit.extend(0.);
-            //             ball_velocity.0.x *= -1.;
-            //         }
-            //         Collision::Right => {
-            //             ball_transform.translation += exit.extend(0.);
-            //             ball_velocity.0.x *= -1.;
-            //         }
-            //         Collision::Top => {
-            //             ball_transform.translation += exit.extend(0.);
-            //             ball_velocity.0.y *= -1.;
-            //         }
-            //         Collision::Bottom => {
-            //             ball_transform.translation += exit.extend(0.);
-            //             ball_velocity.0.y *= -1.;
-            //         }
-            //     }
-            // }
+                // Mapping distance to center to move direction
+                //let mapped_angle = f32_map(0., shape.0.y / 2., 0.5, 1.5, center_dist);
+
+                match collision {
+                    Collision::Left => {
+                        ball_position.0 = exit;
+                        //ball_velocity.0.y = mapped_angle * ball_velocity.0.y.signum();
+                        ball_velocity.0.x = -1.;
+                    }
+                    Collision::Right => {
+                        ball_position.0 = exit;
+                        //ball_velocity.0.y = mapped_angle * ball_velocity.0.y.signum();
+                        ball_velocity.0.x = -1.;
+                    }
+                    Collision::Top => {
+                        ball_position.0 = exit;
+                        ball_velocity.0.y *= -1.;
+                    }
+                    Collision::Bottom => {
+                        ball_position.0 = exit;
+                        ball_velocity.0.y *= -1.;
+                    }
+                }
+            }
         }
     }
 }

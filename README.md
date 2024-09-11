@@ -16,6 +16,9 @@ Started out following [this tutorial](https://taintedcoders.com/bevy/pong-tutori
     - `bevy-pong::actors`/`actors::PongActorsPlugin` - Manages 'active' entities and behavior, such as AI, input and movement handling, and the ball
     - `bevy-pong::score`/`score::PongScorePlugin` - Handles ball loss, score updates, the scoreboard, ball resets, and everything else related to scoring
     - `bevy-pong::gamestate`/`gamestate::PongGameStatePlugin` - Handles core internal functionality like collsions, and converting between custom component and engine-native ones.
+- AI movement uses an easing function to provide smoother behavior, and to make them beatable
+- The collision system now ejects the ball to the closest point outside the bounding box to prevent mistaken collisions
+- The window has basic settings and configuration attached i.e. window title, set size, disable maximizing, etc.
 
 ## Planned next steps
 

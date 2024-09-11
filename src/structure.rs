@@ -169,3 +169,9 @@ pub fn exp_easeout(t: f32, m: f32) -> f32 {
     // 1 - (1 - time)^magnitude
     1. - (1. - t).powf(m)
 }
+
+// Maps range of f32s to each other courtesy of https://stackoverflow.com/questions/5731863/mapping-a-numeric-range-onto-another
+#[allow(dead_code)]
+pub fn f32_map(orig_start: f32, orig_end: f32, new_start: f32, new_end: f32, to_map: f32) -> f32 {
+    new_start + ((new_end - new_start) / (orig_end - orig_start)) * (to_map - orig_start)
+}
