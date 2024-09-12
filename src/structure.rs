@@ -1,3 +1,4 @@
+use avian2d::prelude::{Collider, LinearVelocity, Restitution, RigidBody};
 use bevy::{
     ecs::{component::Component, event::Event},
     math::Vec2,
@@ -12,7 +13,7 @@ pub const WIN_HEIGHT: f32 = 720.;
 pub const WIN_WIDTH: f32 = 1280.;
 
 pub const BALL_SIZE: f32 = 5.; // Size of the ball in world units
-pub const BALL_SPEED: f32 = 3.; // Speed per frame of the ball in world units
+pub const BALL_SPEED: f32 = 200.; // Speed per frame of the ball in world units
 
 pub const PADDLE_SPEED: f32 = 5.; // Speed per frame of the paddles in world units
 pub const PADDLE_WIDTH: f32 = 10.; // Dimensions of the paddles in world units
@@ -25,15 +26,6 @@ pub const GUTTER_HEIGHT: f32 = 20.; // Height of the top and bottom gutters in w
 // ##############################################################
 // # Helper Types
 // ##############################################################
-
-// Object collision sides
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
-pub enum Collision {
-    Left,
-    Right,
-    Top,
-    Bottom,
-}
 
 // Used to communicate which player scored in ScoreEvent
 pub enum Scorer {
@@ -105,10 +97,13 @@ pub struct Scoreboard;
 // Pong ball template
 #[derive(Bundle)]
 pub struct BallBundle {
-    pub ball: Ball,         // Label
-    pub shape: Shape,       // Dimensions of the sprite
-    pub position: Position, // 2d position
-    pub velocity: Velocity, // Sum of system forces/move direction
+    pub ball: Ball,               // Label
+    pub shape: Shape,             // Dimensions of the sprite
+    pub position: Position,       // 2d position
+    pub velocity: LinearVelocity, // Sum of system forces/move direction
+    pub collider: Collider,       // Avian collider
+    pub rigidbody: RigidBody,     // Avian rigidbody
+    pub restitution: Restitution, // Avian collision elasticity
 }
 
 impl BallBundle {
@@ -116,8 +111,11 @@ impl BallBundle {
         Self {
             ball: Ball,
             shape: Shape(Vec2::new(BALL_SIZE, BALL_SIZE)),
-            velocity: Velocity(Vec2::new(x, y)),
+            velocity: LinearVelocity(Vec2::new(x, y)),
             position: Position(Vec2::ZERO),
+            collider: Collider::circle(BALL_SIZE),
+            rigidbody: RigidBody::Dynamic,
+            restitution: Restitution::new(1.),
         }
     }
 }
@@ -129,6 +127,9 @@ pub struct PaddleBundle {
     pub shape: Shape,
     pub position: Position,
     pub velocity: Velocity,
+    pub collider: Collider,
+    pub rigidbody: RigidBody,
+    pub restitution: Restitution,
 }
 
 impl PaddleBundle {
@@ -138,6 +139,9 @@ impl PaddleBundle {
             shape: Shape(Vec2::new(PADDLE_WIDTH, PADDLE_HEIGHT)),
             position: Position(Vec2::new(x, y)),
             velocity: Velocity(Vec2::ZERO),
+            collider: Collider::rectangle(PADDLE_WIDTH, PADDLE_HEIGHT),
+            rigidbody: RigidBody::Static,
+            restitution: Restitution::new(1.),
         }
     }
 }
@@ -148,6 +152,9 @@ pub struct GutterBundle {
     pub gutter: Gutter,
     pub shape: Shape,
     pub position: Position,
+    pub collider: Collider,
+    pub rigidbody: RigidBody,
+    pub restitution: Restitution,
 }
 
 impl GutterBundle {
@@ -156,6 +163,9 @@ impl GutterBundle {
             gutter: Gutter,
             shape: Shape(Vec2::new(width, GUTTER_HEIGHT)),
             position: Position(Vec2::new(x, y)),
+            collider: Collider::rectangle(width, GUTTER_HEIGHT),
+            rigidbody: RigidBody::Static,
+            restitution: Restitution::new(1.),
         }
     }
 }

@@ -1,8 +1,10 @@
 use bevy::{
     app::PluginGroupBuilder,
-    prelude::*,
+    prelude::{default, App, DefaultPlugins, PluginGroup, Window, WindowPlugin},
     window::{EnabledButtons, PresentMode},
 };
+
+use avian2d::prelude::PhysicsPlugins;
 
 mod actors; // Stores behavior of active objects
 mod gamestate;
@@ -41,5 +43,6 @@ fn main() {
             }),
             PongGame,
         ))
+        .add_plugins(PhysicsPlugins::default())
         .run();
 }

@@ -1,9 +1,12 @@
 use crate::structure::*;
+use avian2d::prelude::LinearVelocity;
 use bevy::{
     app::{App, Update},
     ecs::schedule::IntoSystemConfigs,
-    math::Vec2,
-    prelude::{DetectChanges, EventReader, EventWriter, Plugin, Query, Res, ResMut, Text, With},
+    math::{Vec2, Vec3},
+    prelude::{
+        DetectChanges, EventReader, EventWriter, Plugin, Query, Res, ResMut, Text, Transform, With,
+    },
 };
 
 pub struct PongScorePlugin;
@@ -25,8 +28,8 @@ impl Plugin for PongScorePlugin {
 }
 
 // If the ball is off the screen, check which players side and issue a ScoreEvent with that information
-fn detect_scoring(mut ball: Query<&mut Position, With<Ball>>, mut events: EventWriter<ScoreEvent>) {
-    if let Ok(ball) = ball.get_single_mut() {
+fn detect_scoring(ball: Query<&Position, With<Ball>>, mut events: EventWriter<ScoreEvent>) {
+    if let Ok(ball) = ball.get_single() {
         if ball.0.x > WIN_WIDTH / 2. {
             events.send(ScoreEvent(Scorer::Ai));
         } else if ball.0.x < -WIN_WIDTH / 2. {
@@ -47,19 +50,19 @@ fn update_score(mut score: ResMut<Score>, mut events: EventReader<ScoreEvent>) {
 
 // Return the ball to the center on a ScoreEvent
 fn reset_ball(
-    mut ball: Query<(&mut Position, &mut Velocity), With<Ball>>,
+    mut ball: Query<(&mut Transform, &mut LinearVelocity), With<Ball>>,
     mut events: EventReader<ScoreEvent>,
 ) {
     for event in events.read() {
-        if let Ok((mut position, mut velocity)) = ball.get_single_mut() {
+        if let Ok((mut transform, mut velocity)) = ball.get_single_mut() {
             match event.0 {
                 Scorer::Ai => {
-                    position.0 = Vec2::ZERO;
-                    velocity.0 = Vec2::new(-1., 1.);
+                    transform.translation = Vec3::ZERO;
+                    velocity.0 = Vec2::new(-BALL_SPEED, BALL_SPEED);
                 }
                 Scorer::Player => {
-                    position.0 = Vec2::ZERO;
-                    velocity.0 = Vec2::new(1., 1.);
+                    transform.translation = Vec3::ZERO;
+                    velocity.0 = Vec2::new(BALL_SPEED, BALL_SPEED);
                 }
             }
         }

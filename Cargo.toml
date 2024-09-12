@@ -4,8 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+avian2d = "0.1"
 # Bevy Framework with dynamic linking and dual X11/Wayland support
-bevy = { version = "0.14.2", features = ["dynamic_linking", "wayland"] }
+bevy = { version = "0.14", features = ["dynamic_linking", "wayland"] }
 # Disable internal Bevy logging
 log = { version = "*", features = [
     "max_level_debug",

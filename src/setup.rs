@@ -1,3 +1,4 @@
+use avian2d::prelude::Gravity;
 use bevy::{
     app::{App, Startup},
     asset::Assets,
@@ -5,6 +6,7 @@ use bevy::{
         change_detection::ResMut,
         system::{Commands, Query},
     },
+    math::{Vec2, Vec3},
     prelude::{
         default, Camera2dBundle, Circle, Color, ColorMaterial, JustifyText, Mesh, Plugin,
         Rectangle, Text, Text2dBundle, TextStyle, Transform, Window,
@@ -28,6 +30,7 @@ impl Plugin for PongInitPlugin {
                 spawn_scoreboard,
             ),
         );
+        app.insert_resource(Gravity(Vec2::ZERO));
     }
 }
 
@@ -48,7 +51,7 @@ pub fn spawn_ball(
 ) {
     println!("Spawning ball...");
 
-    let ball = BallBundle::new(1., 1.);
+    let ball = BallBundle::new(150., 150.);
 
     // Define ball mesh and material
     let shape = Mesh::from(Circle::new(ball.shape.0.x));
@@ -63,6 +66,7 @@ pub fn spawn_ball(
         MaterialMesh2dBundle {
             mesh: mesh_handle.into(),
             material: material_handle,
+            transform: Transform::from_translation(Vec3::ZERO),
             ..default()
         },
     ));
@@ -99,6 +103,7 @@ pub fn spawn_paddles(
             MaterialMesh2dBundle {
                 mesh: mesh_handle.clone().into(),
                 material: material_handle.clone(),
+                transform: Transform::from_xyz(right_paddle_x, 0., 0.),
                 ..default()
             },
         ));
@@ -109,6 +114,7 @@ pub fn spawn_paddles(
             MaterialMesh2dBundle {
                 mesh: mesh_handle.into(),
                 material: material_handle,
+                transform: Transform::from_xyz(left_paddle_x, 0., 0.),
                 ..default()
             },
         ));
@@ -140,6 +146,7 @@ pub fn spawn_gutters(
         MaterialMesh2dBundle {
             mesh: mesh_handle.clone().into(),
             material: material_handle.clone(),
+            transform: Transform::from_xyz(0., top_gutter_y, 0.),
             ..default()
         },
     ));
@@ -149,6 +156,7 @@ pub fn spawn_gutters(
         MaterialMesh2dBundle {
             mesh: mesh_handle.into(),
             material: material_handle,
+            transform: Transform::from_xyz(0., bottom_gutter_y, 0.),
             ..default()
         },
     ));

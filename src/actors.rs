@@ -1,7 +1,9 @@
+use avian2d::prelude::LinearVelocity;
 use bevy::{
-    app::{App, PreUpdate},
+    app::{App, FixedUpdate, PreUpdate},
     ecs::schedule::IntoSystemConfigs,
-    prelude::{ButtonInput, KeyCode, Plugin, Query, Res, With},
+    math::{Vec2, Vec3Swizzles},
+    prelude::{ButtonInput, KeyCode, Plugin, Query, Res, Transform, With},
 };
 
 use crate::structure::*;
@@ -14,7 +16,7 @@ impl Plugin for PongActorPlugin {
             PreUpdate,
             ((handle_player_input, ai_movement), move_paddles).chain(),
         );
-        app.add_systems(PreUpdate, move_ball);
+        app.add_systems(FixedUpdate, unstick_ball);
     }
 }
 
@@ -51,19 +53,30 @@ fn ai_movement(
 }
 
 // Update position of pong ball
-fn move_ball(mut ball: Query<(&mut Position, &Velocity), With<Ball>>) {
-    if let Ok((mut position, velocity)) = ball.get_single_mut() {
-        position.0 += velocity.0 * BALL_SPEED;
+// fn move_ball(mut ball: Query<(&mut Position, &Velocity), With<Ball>>) {
+//     if let Ok((mut position, velocity)) = ball.get_single_mut() {
+//         position.0 += velocity.0 * BALL_SPEED;
+//     }
+// }
+
+fn unstick_ball(mut ball: Query<&mut LinearVelocity, With<Ball>>) {
+    if let Ok(mut velocity) = ball.get_single_mut() {
+        if velocity.0.x < 10. && velocity.0.y < 10. {
+            velocity.0 = Vec2::new(
+                BALL_SPEED * velocity.x.signum(),
+                BALL_SPEED * velocity.y.signum(),
+            );
+        }
     }
 }
 
-fn move_paddles(mut paddle: Query<(&mut Position, &Velocity), With<Paddle>>) {
+fn move_paddles(mut paddle: Query<(&mut Transform, &Velocity), With<Paddle>>) {
     let max_y = WIN_HEIGHT / 2. - GUTTER_HEIGHT - PADDLE_HEIGHT / 2.;
 
-    for (mut position, velocity) in &mut paddle {
-        let new_position = position.0 + velocity.0 * PADDLE_SPEED;
+    for (mut transform, velocity) in &mut paddle {
+        let new_position = transform.translation.xy() + velocity.0 * PADDLE_SPEED;
         if new_position.y.abs() < max_y {
-            position.0 = new_position;
+            transform.translation = new_position.extend(0.);
         }
     }
 }
