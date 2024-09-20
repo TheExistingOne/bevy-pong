@@ -24,13 +24,13 @@ Started out following [this tutorial](https://taintedcoders.com/bevy/pong-tutori
 
 - [x] Make the AI less jittery
 - [X] Clean up collision to actually eject the ball instead of just reversing direction to avoid edge cases
-- [ ] Vary hit angle based on how close to the center of the paddle you were (Needs continuous collision to prevent clipping, pending migration to avian physics)
+- [x] Vary hit angle based on how close to the center of the paddle you were (Needs continuous collision to prevent clipping, pending migration to avian physics)
 - [ ] Win state
 - [x] Make the AI beatable
 - [ ] Use `bevy::ui` instead of using hacked together FontBundle2d UI
 - [ ] Work out bevy scenes
 - [ ] Make a menu
-- [ ] Add some sprites to things
+- [x] Add some sprites to things
 - [x] Make the window a little more consistent
 - [x] Migrate to an actual collision handler
 - [ ] Add some shaders and polish

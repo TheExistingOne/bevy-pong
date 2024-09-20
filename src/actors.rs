@@ -64,17 +64,21 @@ fn reflect_ball(
     paddle: Query<(Entity, &Position), With<Paddle>>,
     mut events: EventReader<CollisionEnded>,
 ) {
+    // Get a list of collisions since the last FixedUpdate and the entities involved
     for CollisionEnded(entity1, entity2) in events.read() {
         if let Ok((entity_ball, mut ball_vel, ball_pos)) = ball.get_single_mut() {
             for (entity_paddle, paddle_pos) in paddle.iter() {
-                // I am aware this is a cursed abomination that can probably be better,
-                // but it is checking whether the two entities involved are a ball and a paddle
+                // I am aware this is a cursed abomination that can probably be better
+                // Check if the two entities involved were a ball and a paddle
                 if (entity1.index() == entity_ball.index()
                     || entity2.index() == entity_ball.index())
                     && (entity1.index() == entity_paddle.index()
                         || entity2.index() == entity_paddle.index())
                 {
+                    // How far from the center of the paddle did the ball hit? (0 = center, 25 = corner pixel)
                     let dist_from_center = (paddle_pos.0.y - ball_pos.0.y).abs();
+
+                    // Remap that to a hit velocity between BALL_SPEED and 1.5 times BALL_SPEED
                     let scaled_dist = f32_map(
                         0.,
                         PADDLE_HEIGHT / 2.,
@@ -82,11 +86,14 @@ fn reflect_ball(
                         BALL_SPEED * 1.5,
                         dist_from_center,
                     );
+
+                    // Convert that to a full velocity, respecting conservation of energy by scaling down the horizontal velocity accordingly
+                    // This makes the hit behavior feel less weird
                     let hit_velocity =
                         vec2((BALL_SPEED * 2.) - scaled_dist, scaled_dist) * ball_vel.signum();
 
+                    // Apply that velocity to the ball
                     ball_vel.0 = hit_velocity;
-                    println!("Reassigned ball velocity!");
                 }
             }
         }
@@ -95,6 +102,8 @@ fn reflect_ball(
 
 fn unstick_ball(mut ball: Query<&mut LinearVelocity, With<Ball>>) {
     if let Ok(mut velocity) = ball.get_single_mut() {
+        // If the player or AI moves weirdly the ball can get pinched between the paddle and the bumper
+        // This detects if the horizontal and vertical velocity get below 10, and resets them to default just in case
         if velocity.0.x < 10. && velocity.0.y < 10. {
             velocity.0 = Vec2::new(
                 BALL_SPEED * velocity.x.signum(),

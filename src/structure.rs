@@ -12,7 +12,7 @@ use bevy::{
 pub const WIN_HEIGHT: f32 = 720.;
 pub const WIN_WIDTH: f32 = 1280.;
 
-pub const BALL_SIZE: f32 = 5.; // Size of the ball in world units
+pub const BALL_SIZE: f32 = 10.; // Size of the ball in world units
 pub const BALL_SPEED: f32 = 200.; // Speed per frame of the ball in world units
 
 pub const PADDLE_SPEED: f32 = 5.; // Speed per frame of the paddles in world units

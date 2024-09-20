@@ -1,17 +1,17 @@
 use avian2d::prelude::Gravity;
 use bevy::{
     app::{App, Startup},
-    asset::Assets,
+    asset::{AssetServer, Assets},
     ecs::{
         change_detection::ResMut,
         system::{Commands, Query},
     },
-    math::{Vec2, Vec3},
+    math::Vec2,
     prelude::{
-        default, Camera2dBundle, Circle, Color, ColorMaterial, JustifyText, Mesh, Plugin,
-        Rectangle, Text, Text2dBundle, TextStyle, Transform, Window,
+        default, Camera2dBundle, Color, ColorMaterial, JustifyText, Mesh, Plugin, Rectangle, Res,
+        Text, Text2dBundle, TextStyle, Transform, Window,
     },
-    sprite::{Anchor, MaterialMesh2dBundle},
+    sprite::{Anchor, MaterialMesh2dBundle, Sprite, SpriteBundle},
 };
 
 use crate::structure::*;
@@ -46,29 +46,37 @@ pub fn spawn_camera(mut commands: Commands) {
 // Spawn a red pong ball at the center of the screen moving up-right
 pub fn spawn_ball(
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    // mut meshes: ResMut<Assets<Mesh>>,
+    // mut materials: ResMut<Assets<ColorMaterial>>,
+    asset_server: Res<AssetServer>,
 ) {
     println!("Spawning ball...");
 
     let ball = BallBundle::new(150., 150.);
 
     // Define ball mesh and material
-    let shape = Mesh::from(Circle::new(ball.shape.0.x));
-    let color = ColorMaterial::from(Color::hsl(0., 1., 0.28));
+    //let shape = Mesh::from(Circle::new(ball.shape.0.x));
+    //let color = ColorMaterial::from(Color::hsl(0., 1., 0.28));
 
     // Instance mesh into memory and return Handle reference
-    let mesh_handle = meshes.add(shape);
-    let material_handle = materials.add(color);
+    //let mesh_handle = meshes.add(shape);
+    //let material_handle = materials.add(color);
 
     commands.spawn((
         ball,
-        MaterialMesh2dBundle {
-            mesh: mesh_handle.into(),
-            material: material_handle,
-            transform: Transform::from_translation(Vec3::ZERO),
+        SpriteBundle {
+            texture: asset_server.load("ball.png"),
+            sprite: Sprite {
+                custom_size: Some((BALL_SIZE, BALL_SIZE).into()),
+                ..default()
+            },
             ..default()
-        },
+        }, // MaterialMesh2dBundle {
+           //     mesh: mesh_handle.into(),
+           //     material: material_handle,
+           //     transform: Transform::from_translation(Vec3::ZERO),
+           //     ..default()
+           // },
     ));
 }
 
@@ -91,7 +99,7 @@ pub fn spawn_paddles(
         let ai_paddle = PaddleBundle::new(left_paddle_x, 0.);
 
         let shape = Mesh::from(Rectangle::new(ai_paddle.shape.0.x, ai_paddle.shape.0.y));
-        let color = ColorMaterial::from(Color::hsl(105., 1., 0.28));
+        let color = ColorMaterial::from(Color::WHITE);
 
         // Instance mesh into memory and return Handle reference
         let mesh_handle = meshes.add(shape);
@@ -136,7 +144,7 @@ pub fn spawn_gutters(
     let bottom_gutter = GutterBundle::new(0., bottom_gutter_y, WIN_WIDTH);
 
     let mesh = Mesh::from(Rectangle::from_size(top_gutter.shape.0));
-    let material = ColorMaterial::from(Color::hsl(0., 1., 1.));
+    let material = ColorMaterial::from(Color::WHITE);
 
     let mesh_handle = meshes.add(mesh);
     let material_handle = materials.add(material);

@@ -1,6 +1,6 @@
 use bevy::{
     app::PluginGroupBuilder,
-    prelude::{default, App, DefaultPlugins, PluginGroup, Window, WindowPlugin},
+    prelude::{default, App, DefaultPlugins, ImagePlugin, PluginGroup, Window, WindowPlugin},
     window::{EnabledButtons, PresentMode},
 };
 
@@ -26,21 +26,23 @@ impl PluginGroup for PongGame {
 fn main() {
     App::new()
         .add_plugins((
-            DefaultPlugins.set(WindowPlugin {
-                primary_window: Some(Window {
-                    title: String::from("Bevy Pong!"),
-                    name: Some(String::from("dev.mialikestech.bevypong")),
-                    resolution: (structure::WIN_WIDTH, structure::WIN_HEIGHT).into(),
-                    present_mode: PresentMode::AutoVsync,
-                    resizable: false,
-                    enabled_buttons: EnabledButtons {
-                        maximize: false,
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: String::from("Bevy Pong!"),
+                        name: Some(String::from("dev.mialikestech.bevypong")),
+                        resolution: (structure::WIN_WIDTH, structure::WIN_HEIGHT).into(),
+                        present_mode: PresentMode::AutoVsync,
+                        resizable: false,
+                        enabled_buttons: EnabledButtons {
+                            maximize: false,
+                            ..default()
+                        },
                         ..default()
-                    },
+                    }),
                     ..default()
-                }),
-                ..default()
-            }),
+                })
+                .set(ImagePlugin::default_nearest()),
             PongGame,
         ))
         .add_plugins(PhysicsPlugins::default())
