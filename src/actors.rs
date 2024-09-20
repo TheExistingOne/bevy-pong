@@ -1,9 +1,9 @@
-use avian2d::prelude::LinearVelocity;
+use avian2d::prelude::{CollisionEnded, LinearVelocity};
 use bevy::{
     app::{App, FixedUpdate, PreUpdate},
     ecs::schedule::IntoSystemConfigs,
-    math::{Vec2, Vec3Swizzles},
-    prelude::{ButtonInput, KeyCode, Plugin, Query, Res, Transform, With},
+    math::{vec2, Vec2, Vec3Swizzles},
+    prelude::{ButtonInput, Entity, EventReader, KeyCode, Plugin, Query, Res, Transform, With},
 };
 
 use crate::structure::*;
@@ -16,7 +16,7 @@ impl Plugin for PongActorPlugin {
             PreUpdate,
             ((handle_player_input, ai_movement), move_paddles).chain(),
         );
-        app.add_systems(FixedUpdate, unstick_ball);
+        app.add_systems(FixedUpdate, (unstick_ball, reflect_ball));
     }
 }
 
@@ -58,6 +58,40 @@ fn ai_movement(
 //         position.0 += velocity.0 * BALL_SPEED;
 //     }
 // }
+
+fn reflect_ball(
+    mut ball: Query<(Entity, &mut LinearVelocity, &Position), With<Ball>>,
+    paddle: Query<(Entity, &Position), With<Paddle>>,
+    mut events: EventReader<CollisionEnded>,
+) {
+    for CollisionEnded(entity1, entity2) in events.read() {
+        if let Ok((entity_ball, mut ball_vel, ball_pos)) = ball.get_single_mut() {
+            for (entity_paddle, paddle_pos) in paddle.iter() {
+                // I am aware this is a cursed abomination that can probably be better,
+                // but it is checking whether the two entities involved are a ball and a paddle
+                if (entity1.index() == entity_ball.index()
+                    || entity2.index() == entity_ball.index())
+                    && (entity1.index() == entity_paddle.index()
+                        || entity2.index() == entity_paddle.index())
+                {
+                    let dist_from_center = (paddle_pos.0.y - ball_pos.0.y).abs();
+                    let scaled_dist = f32_map(
+                        0.,
+                        PADDLE_HEIGHT / 2.,
+                        BALL_SPEED,
+                        BALL_SPEED * 1.5,
+                        dist_from_center,
+                    );
+                    let hit_velocity =
+                        vec2((BALL_SPEED * 2.) - scaled_dist, scaled_dist) * ball_vel.signum();
+
+                    ball_vel.0 = hit_velocity;
+                    println!("Reassigned ball velocity!");
+                }
+            }
+        }
+    }
+}
 
 fn unstick_ball(mut ball: Query<&mut LinearVelocity, With<Ball>>) {
     if let Ok(mut velocity) = ball.get_single_mut() {

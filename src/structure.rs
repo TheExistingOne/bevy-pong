@@ -1,4 +1,4 @@
-use avian2d::prelude::{Collider, LinearVelocity, Restitution, RigidBody};
+use avian2d::prelude::{Collider, Friction, LinearVelocity, Restitution, RigidBody};
 use bevy::{
     ecs::{component::Component, event::Event},
     math::Vec2,
@@ -53,11 +53,11 @@ pub struct Score {
 // ##############################################################
 
 // 2D object position, mapped internally to object transform by project_positions()
-#[derive(Component, Default)]
+#[derive(Component, Default, Debug)]
 pub struct Position(pub Vec2);
 
 // 2D "velocity" - effectively a measure of what direction all the systems want an object to go
-#[derive(Component, Default)]
+#[derive(Component, Default, Debug)]
 pub struct Velocity(pub Vec2);
 
 // Generic component holding the height and width of an entity's primitive mesh
@@ -104,6 +104,7 @@ pub struct BallBundle {
     pub collider: Collider,       // Avian collider
     pub rigidbody: RigidBody,     // Avian rigidbody
     pub restitution: Restitution, // Avian collision elasticity
+    pub friction: Friction,       // Avian coefficient of friction
 }
 
 impl BallBundle {
@@ -116,6 +117,7 @@ impl BallBundle {
             collider: Collider::circle(BALL_SIZE),
             rigidbody: RigidBody::Dynamic,
             restitution: Restitution::new(1.),
+            friction: Friction::new(0.),
         }
     }
 }
@@ -130,6 +132,7 @@ pub struct PaddleBundle {
     pub collider: Collider,
     pub rigidbody: RigidBody,
     pub restitution: Restitution,
+    pub friction: Friction,
 }
 
 impl PaddleBundle {
@@ -142,6 +145,7 @@ impl PaddleBundle {
             collider: Collider::rectangle(PADDLE_WIDTH, PADDLE_HEIGHT),
             rigidbody: RigidBody::Static,
             restitution: Restitution::new(1.),
+            friction: Friction::new(0.),
         }
     }
 }
@@ -155,6 +159,7 @@ pub struct GutterBundle {
     pub collider: Collider,
     pub rigidbody: RigidBody,
     pub restitution: Restitution,
+    pub friction: Friction,
 }
 
 impl GutterBundle {
@@ -166,6 +171,7 @@ impl GutterBundle {
             collider: Collider::rectangle(width, GUTTER_HEIGHT),
             rigidbody: RigidBody::Static,
             restitution: Restitution::new(1.),
+            friction: Friction::new(0.),
         }
     }
 }

@@ -32,7 +32,7 @@ Started out following [this tutorial](https://taintedcoders.com/bevy/pong-tutori
 - [ ] Make a menu
 - [ ] Add some sprites to things
 - [x] Make the window a little more consistent
-- [ ] Migrate to an actual collision handler
+- [x] Migrate to an actual collision handler
 - [ ] Add some shaders and polish
 
 ---
